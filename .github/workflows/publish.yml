@@ -1,23 +1,16 @@
-name: "Publish"
+name: "Test"
 
-on:
-  release:
-    types: [published]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   build:
-    name: Build
+    name: Test build
     runs-on: ubuntu-latest
     strategy:
       matrix:
         target: ["ai.server"]
       fail-fast: false
     steps:
-      - name: Free disk space
-        if: matrix.target == 'ai.server'
-        run: |
-          curl -L -k https://raw.githubusercontent.com/apache/flink/master/tools/azure-pipelines/free_disk_space.sh | bash
       - name: Checkout the repository
         uses: actions/checkout@v4
       - name: Login to GHCR
@@ -35,4 +28,4 @@ jobs:
             --no-latest \
             -i hassio-addon-${{ matrix.target }}-{arch} \
             --target ${{ matrix.target }} \
-            --docker-hub ghcr.io/${{ secrets.DOCKER_USERNAME }}
+            --docker-hub ghcr.io/${{ github.actor }}
